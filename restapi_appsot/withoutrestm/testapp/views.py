@@ -1,34 +1,37 @@
 import json
-
 from django.views.generic import View
 from testapp.models import Employee
-import json
 from django.http import HttpResponse
 from django.core.serializers import serialize
+from testapp.mixins import SerialiseMixin
+#from django.views.decorators.csrf import csrf_exempt
+#from django.utils.decorators import method_decorator
+#from testapp.utils import is_json
+#from testapp.forms import EmployeeForm
 
 
 class EmployeeDetailCBV(View):
+    # get method for perticular employee
     def get(self, request, id, *args, **kwargs):
-        emp = Employee.objects.get(id=id)
+        try:
+            emp = Employee.objects.get(id=id)
+        except Employee.DoesNotExist:
+            json_data = json.dumps({'msg': 'resouse not vailable'})
+            return HttpResponse(json_data, content_type='application/json', status=404)
+        else:
+            json_data = serialize('json', [emp, ], fields=('eno', 'ename', 'eaddr'))
 
-        '''
-                # converting data into dictionary
-                emp_data = {
-                    'eno': emp.eno,
-                    'ename': emp.ename,
-                    'esal' : emp.esal,
-                    'eaddr' : emp.eaddr
-                }
-                # convert python dictionary to json object
-                json_data = json.dumps(emp_data)
-        '''
+            # output [{"model": "testapp.employee", "pk": 2, "fields": {"eno": 200, "ename": "bunny", "eaddr": "hydrabad"}}]
 
-        # json_data = serialize('json', [emp, ])   #saves above code
+            return HttpResponse(json_data, content_type='application/json', status=200)
 
-        # [emp,] = we want to pass query set
-# o/p [{"model": "testapp.employee", "pk": 2, "fields": {"eno": 200, "ename": "bunny", "esal":2000, "eaddr": "hydrabad"}}]
 
-        json_data = serialize('json', [emp, ], fields=('eno', 'ename', 'eaddr'))
+# ---------------------------------------------------------------------------------------------------------------------
+#@method_decorator(csrf_exempt, name='dispatch')
+class EmployeeDetailListCBV(SerialiseMixin, View):
+    # get method for all employee
+    def get(self, request, *args, **kwargs):
+        qs = Employee.objects.all()
+        json_data = self.serialize(qs)
+        return HttpResponse(json_data, content_type='application/json', status=200)
 
-# output [{"model": "testapp.employee", "pk": 2, "fields": {"eno": 200, "ename": "bunny", "eaddr": "hydrabad"}}]
-        return HttpResponse(json_data, content_type='application/json')

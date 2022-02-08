@@ -20,6 +20,7 @@ from testapp import views
 urlpatterns = [
     re_path('admin/', admin.site.urls),
     re_path(r'^api/(?P<id>\d+)/$', views.EmployeeDetailCBV.as_view()),
+    re_path(r'^api/$', views.EmployeeDetailListCBV.as_view()),
 ]
 
 # as_view()  for converting class based view to function based view
