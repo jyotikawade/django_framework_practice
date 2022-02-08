@@ -9,26 +9,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
 
-def Employee_Detail(request, id):
-    emp = Employee.objects.get(id=id)
-    serializer = EmployeeSerializer(emp)
-    # json_data = JSONRenderer().render(serializer.data)
-    # return HttpResponse(json_data, content_type='application/json')
-    return JsonResponse(serializer.data)  # can do work in one line
-
-
-# all employee data
-def Employee_Detail_All(request):
-    emp = Employee.objects.all()
-    serializer = EmployeeSerializer(emp, many=True)
-    # json_data = JSONRenderer().render(serializer.data)
-    # return HttpResponse(json_data, content_type='application/json')
-    return JsonResponse(serializer.data, safe=False)
-
-
 @method_decorator(csrf_exempt, name='dispatch')
 class EmployeeAPI(View):
-    """
+
     def get(self, request, *args, **kwargs):
         if request.method == 'GET':
             json_data = request.body
@@ -44,7 +27,6 @@ class EmployeeAPI(View):
             serializer = EmployeeSerializer(emp, many=True)
             json_data = JSONRenderer().render(serializer.data)
             return HttpResponse(json_data, content_type='application/json')
-    """
 
     def post(self, request, *args, **kwargs):
         if request.method == 'POST':
@@ -70,7 +52,7 @@ class EmployeeAPI(View):
             serializer = EmployeeSerializer(emp, data=pythondata, partial=True)
             if serializer.is_valid():
                 serializer.save()
-                res = {'msg': 'data created'}
+                res = {'msg': 'data updated'}
                 json_data = JSONRenderer().render(res)
                 return HttpResponse(json_data, content_type='application/json')
             json_data = JSONRenderer().render(serializer.errors)
@@ -84,7 +66,7 @@ class EmployeeAPI(View):
             id = pythondata.get('id')
             emp = Employee.objects.get(id=id)
             emp.delete()
-            res = {'msg': 'data created'}
+            res = {'msg': 'data deleted'}
             # json_data = JSONRenderer().render(res)
             # return HttpResponse(json_data, content_type='application/json')
             return JsonResponse(res, safe=False)

@@ -3,6 +3,7 @@ from .models import Employee
 
 
 class EmployeeSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
     eno = serializers.IntegerField()
     ename = serializers.CharField(max_length=70)
     esal = serializers.FloatField()
