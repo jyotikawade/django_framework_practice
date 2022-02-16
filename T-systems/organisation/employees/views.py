@@ -1,4 +1,5 @@
 """all import statement"""
+import json
 
 """ The master class-based base view. All other class-based views inherit from this base class."""
 from django.views import View
@@ -40,7 +41,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 class EmployeeList(ListAPIView):
-
     """
     class = EmployeeList
     used for get specific employee according to requirement
@@ -55,9 +55,6 @@ class EmployeeList(ListAPIView):
     serializer_class = EmployeeSerializer
     filter_backends = [DjangoFilterBackend]
     filter_fields = ['ename', 'eaddr']
-
-
-
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -106,14 +103,20 @@ class EmployeeAPI(View):
         variable-length argument list.
 
         """
+
         if id is not None:
-            specific_employee_obj = Employee.objects.get(id=id)
-            serializer = EmployeeSerializer(specific_employee_obj)
-            """ render() Combines a given template with a given context dictionary"""
-            """ and returns an HttpResponse object with that rendered text."""
-            """ JSONRenderer Renders the request data into JSON, using utf-8 encoding."""
-            json_data = JSONRenderer().render(serializer.data)
-            return HttpResponse(json_data, content_type='application/json')
+            try:
+                specific_employee_obj = Employee.objects.get(id=id)
+            except Employee.DoesNotExist:
+                json_data = json.dumps({'msg': 'not exist'})
+                return HttpResponse(json_data, content_type='application/json')
+            else:
+                serializer = EmployeeSerializer(specific_employee_obj)
+                """ render() Combines a given template with a given context dictionary"""
+                """ and returns an HttpResponse object with that rendered text."""
+                """ JSONRenderer Renders the request data into JSON, using utf-8 encoding."""
+                json_data = JSONRenderer().render(serializer.data)
+                return HttpResponse(json_data, content_type='application/json')
 
         all_employee_obj = Employee.objects.all()
         serializer = EmployeeSerializer(all_employee_obj, many=True)  # if multiple object then many = true
@@ -141,7 +144,7 @@ class EmployeeAPI(View):
 
         """
         if request.method == 'POST':
-            json_data = request.body  # getting json data and converting to python 86 78 88
+            json_data = request.body  # getting json data and converting to python
             stream = io.BytesIO(json_data)
             python_data = JSONParser().parse(stream)
             serializer = EmployeeSerializer(data=python_data)
@@ -154,34 +157,80 @@ class EmployeeAPI(View):
             return HttpResponse(json_data, content_type='application/json')
 
     def put(self, request, *args, **kwargs):
+        """
+        Parameters
+        ----------
+        self:
+        The self parameter is a reference to the current instance of the class
+
+        request :
+        an HttpRequest object
+
+        *args
+        variable number of arguments to a function.
+        It is used to pass a non-key worded, variable-length argument list.
+
+        **kwargs
+        used to pass a keyworded argument,
+        variable-length argument list.
+
+        """
         if request.method == 'PUT':
             json_data = request.body
             stream = io.BytesIO(json_data)
             python_data = JSONParser().parse(stream)
             id = python_data.get('id')
-            specific_employee_obj = Employee.objects.get(id=id)
-            """when you dont want to update all fields at that time partial = true"""
-            serializer = EmployeeSerializer(specific_employee_obj, data=python_data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                Message_to_screen = {'msg': 'data updated'}
-                json_data = JSONRenderer().render(Message_to_screen)
+            try:
+                specific_employee_obj = Employee.objects.get(id=id)
+            except Employee.DoesNotExist:
+                json_data = json.dumps({'msg': 'id does not exist'})
                 return HttpResponse(json_data, content_type='application/json')
-            json_data = JSONRenderer().render(serializer.errors)
-            return HttpResponse(json_data, content_type='application/json')
+            else:
+                """when you dont want to update all fields at that time partial = true"""
+                serializer = EmployeeSerializer(specific_employee_obj, data=python_data, partial=True)
+                if serializer.is_valid():
+                    serializer.save()
+                    Message_to_screen = {'msg': 'data updated'}
+                    json_data = JSONRenderer().render(Message_to_screen)
+                    return HttpResponse(json_data, content_type='application/json')
+                json_data = JSONRenderer().render(serializer.errors)
+                return HttpResponse(json_data, content_type='application/json')
 
     def delete(self, request, *args, **kwargs):
+        """
+        Parameters
+        ----------
+        self:
+        The self parameter is a reference to the current instance of the class
+
+        request :
+        an HttpRequest object
+
+        *args
+        variable number of arguments to a function.
+        It is used to pass a non-key worded, variable-length argument list.
+
+        **kwargs
+        used to pass a keyworded argument,
+        variable-length argument list.
+
+        """
         if request.method == 'DELETE':
             json_data = request.body
             stream = io.BytesIO(json_data)
             python_data = JSONParser().parse(stream)
             id = python_data.get('id')
-            specific_employee_obj = Employee.objects.get(id=id)
-            specific_employee_obj.delete()
-            Message_to_screen = {'msg': 'data deleted'}
-            # json_data = JSONRenderer().render(res)
-            # return HttpResponse(json_data, content_type='application/json')
-            return JsonResponse(Message_to_screen)
-            # in order to serialise data other than dict , then do safe = FALSE
-            # if safe parameter is set to false then it can be any json serializable object
-            # first parameter shpuld be dict instance
+            try:
+                specific_employee_obj = Employee.objects.get(id=id)
+            except Employee.DoesNotExist:
+                json_data = json.dumps({'msg': 'id does not exist'})
+                return HttpResponse(json_data, content_type='application/json')
+            else:
+                specific_employee_obj.delete()
+                Message_to_screen = {'msg': 'data deleted'}
+                # json_data = JSONRenderer().render(res)
+                # return HttpResponse(json_data, content_type='application/json')
+                return JsonResponse(Message_to_screen)
+                # in order to serialise data other than dict , then do safe = FALSE
+                # if safe parameter is set to false then it can be any json serializable object
+                # first parameter shpuld be dict instance
