@@ -4,11 +4,11 @@ import json
 """ The master class-based base view. All other class-based views inherit from this base class."""
 from django.views import View
 
-""" importing model  Employee which we have created """
-from .models import Employee
+""" importing model  Users which we have created """
+from .models import Users
 
-""" importing EmployeeSerializer which we have created"""
-from .serializers import EmployeeSerializer
+""" importing UserSerializer which we have created"""
+from .serializers import UserSerializer
 
 """ Renders the request data into JSON, using utf-8 encoding."""
 from rest_framework.renderers import JSONRenderer
@@ -30,54 +30,28 @@ from rest_framework.parsers import JSONParser
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
-"""
-Used for read-only endpoints to represent a collection of model instances
-Provides a get method handler.
-"""
-from rest_framework.generics import ListAPIView
-
-""" learning this part """
-from django_filters.rest_framework import DjangoFilterBackend
-
-
-class EmployeeList(ListAPIView):
-    """
-    class = EmployeeList
-    used for get specific employee according to requirement
-
-    ...
-
-    methods
-    ------------
-    none
-    """
-    queryset = Employee.objects.all()
-    serializer_class = EmployeeSerializer
-    filter_backends = [DjangoFilterBackend]
-    filter_fields = ['ename', 'eaddr']
-
 
 @method_decorator(csrf_exempt, name='dispatch')
-class EmployeeAPI(View):
+class UsersAPI(View):
     """
-    class - EmployeeAPI
+    class - UsersAPI
     use to perform get put post delete operation
     ...
 
     methods
     ------------
 
-    get    -  displays employee table details , get(self, request, id=None, *args, **kwargs)
-              input = if id is specified in url specific employee ditails will be displayed
+    get    -  displays Users table details , get(self, request, id=None, *args, **kwargs)
+              input = if id is specified in url specific Users ditails will be displayed
 
-    post   -  insert employee detail intable , post(self, request, *args, **kwargs):
-              input  = employee record in json format
+    post   -  insert Users detail intable , post(self, request, *args, **kwargs):
+              input  = Users record in json format
 
     put    -  used to update , put(self, request, *args, **kwargs):
-              input = employee record in json format
+              input = Users record in json format
 
     delete -  used to delete record ,delete(self, request, *args, **kwargs):
-              input = employee record in json format
+              input = Users record in json format
 
     """
 
@@ -92,7 +66,7 @@ class EmployeeAPI(View):
         an HttpRequest object
 
         id : int, optional
-        employee id to display information
+        Users id to display information
 
         *args
         variable number of arguments to a function.
@@ -106,20 +80,20 @@ class EmployeeAPI(View):
 
         if id is not None:
             try:
-                specific_employee_obj = Employee.objects.get(id=id)
-            except Employee.DoesNotExist:
+                specific_Users_obj = Users.objects.get(id=id)
+            except Users.DoesNotExist:
                 json_data = json.dumps({'msg': 'not exist'})
                 return HttpResponse(json_data, content_type='application/json')
             else:
-                serializer = EmployeeSerializer(specific_employee_obj)
+                serializer = UserSerializer(specific_Users_obj)
                 """ render() Combines a given template with a given context dictionary"""
                 """ and returns an HttpResponse object with that rendered text."""
                 """ JSONRenderer Renders the request data into JSON, using utf-8 encoding."""
                 json_data = JSONRenderer().render(serializer.data)
                 return HttpResponse(json_data, content_type='application/json')
 
-        all_employee_obj = Employee.objects.all()
-        serializer = EmployeeSerializer(all_employee_obj, many=True)  # if multiple object then many = true
+        all_Users_obj = Users.objects.all()
+        serializer = UserSerializer(all_Users_obj, many=True)  # if multiple object then many = true
         """this is used to render serialised data into json which is understandable by front end"""
         json_data = JSONRenderer().render(serializer.data)
         return HttpResponse(json_data, content_type='application/json')
@@ -147,7 +121,7 @@ class EmployeeAPI(View):
             json_data = request.body  # getting json data and converting to python
             stream = io.BytesIO(json_data)
             python_data = JSONParser().parse(stream)
-            serializer = EmployeeSerializer(data=python_data)
+            serializer = UserSerializer(data=python_data)
             if serializer.is_valid():
                 serializer.save()
                 Message_to_screen = {'msg': 'data created'}
@@ -181,13 +155,13 @@ class EmployeeAPI(View):
             python_data = JSONParser().parse(stream)
             id = python_data.get('id')
             try:
-                specific_employee_obj = Employee.objects.get(id=id)
-            except Employee.DoesNotExist:
+                specific_Users_obj = Users.objects.get(id=id)
+            except Users.DoesNotExist:
                 json_data = json.dumps({'msg': 'id does not exist'})
                 return HttpResponse(json_data, content_type='application/json')
             else:
                 """when you dont want to update all fields at that time partial = true"""
-                serializer = EmployeeSerializer(specific_employee_obj, data=python_data, partial=True)
+                serializer = UserSerializer(specific_Users_obj, data=python_data, partial=True)
                 if serializer.is_valid():
                     serializer.save()
                     Message_to_screen = {'msg': 'data updated'}
@@ -221,12 +195,12 @@ class EmployeeAPI(View):
             python_data = JSONParser().parse(stream)
             id = python_data.get('id')
             try:
-                specific_employee_obj = Employee.objects.get(id=id)
-            except Employee.DoesNotExist:
+                specific_Users_obj = Users.objects.get(id=id)
+            except Users.DoesNotExist:
                 json_data = json.dumps({'msg': 'id does not exist'})
                 return HttpResponse(json_data, content_type='application/json')
             else:
-                specific_employee_obj.delete()
+                specific_Users_obj.delete()
                 Message_to_screen = {'msg': 'data deleted'}
                 # json_data = JSONRenderer().render(res)
                 # return HttpResponse(json_data, content_type='application/json')
