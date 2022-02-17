@@ -14,14 +14,21 @@ from employees import views
 
 import users.views
 """in this list we have defined all url patterns"""
+
 urlpatterns = [
     re_path(r'^admin/', admin.site.urls),
-    re_path(r'^organisation/employees/$', views.EmployeeAPI.as_view()),
-    re_path(r'^organisation/employees/(?P<id>\d+)/$', views.EmployeeAPI.as_view()),
+    re_path(r'^organisation/employees/$', views.DisplayEmployeeDetails),
+    re_path(r'^organisation/employees/(?P<id>\d+)/$', views.DisplayEmployeeDetails),
+    re_path(r'^organisation/employees/create-record/$', views.CreateEmployeeDetails),
+    re_path(r'^organisation/employees/update-record/$', views.UpdateEmployeeDetails),
+    re_path(r'^organisation/employees/delete-record/$', views.DeleteEmployeeDetails),
     re_path(r'^organisation/employees/search/$', views.EmployeeList.as_view()),
 
-    re_path(r'^organisation/users/$', users.views.UsersAPI.as_view()),
-    re_path(r'^organisation/users/(?P<id>\d+)/$', users.views.UsersAPI.as_view()),
+    re_path(r'^organisation/users/$', users.views.DisplayUserDetails),
+    re_path(r'^organisation/users/(?P<id>\d+)/$', users.views.DisplayUserDetails),
+    re_path(r'^organisation/users/create-record/$', users.views.CreateUserDetails),
+    re_path(r'^organisation/users/update-record/$', users.views.UpdateUserDetails),
+    re_path(r'^organisation/users/delete-record/$', users.views.DeleteUserDetails),
 
 ]
 
