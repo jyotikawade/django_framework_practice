@@ -10,25 +10,21 @@ from django.contrib import admin
 from django.urls import re_path
 
 """this is our file in which we have written all methods"""
-from employees import views
+import employees.views
 
 import users.views
+
 """in this list we have defined all url patterns"""
 
 urlpatterns = [
     re_path(r'^admin/', admin.site.urls),
-    re_path(r'^organisation/employees/$', views.DisplayEmployeeDetails),
-    re_path(r'^organisation/employees/(?P<id>\d+)/$', views.DisplayEmployeeDetails),
-    re_path(r'^organisation/employees/create-record/$', views.CreateEmployeeDetails),
-    re_path(r'^organisation/employees/update-record/$', views.UpdateEmployeeDetails),
-    re_path(r'^organisation/employees/delete-record/$', views.DeleteEmployeeDetails),
-    re_path(r'^organisation/employees/search/$', views.EmployeeList.as_view()),
 
-    re_path(r'^organisation/users/$', users.views.DisplayUserDetails),
-    re_path(r'^organisation/users/(?P<id>\d+)/$', users.views.DisplayUserDetails),
-    re_path(r'^organisation/users/create-record/$', users.views.CreateUserDetails),
-    re_path(r'^organisation/users/update-record/$', users.views.UpdateUserDetails),
-    re_path(r'^organisation/users/delete-record/$', users.views.DeleteUserDetails),
+    re_path(r'^employees/$', employees.views.EmployeeDetails),
+    re_path(r'^employees/(?P<id>\d+)$', employees.views.EmployeeDetails),
+
+    re_path(r'^employees/filter/$', employees.views.EmployeeList.as_view()),
+
+    re_path(r'^users/$', users.views.UserDetails),
+    re_path(r'^users/(?P<id>\d+)$', users.views.UserDetails),
 
 ]
-
