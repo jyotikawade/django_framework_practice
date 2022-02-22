@@ -1,30 +1,12 @@
-"""all import statement"""
-
-""" importing model  Employee which we have created """
 from .models import Employee
-
-""" importing EmployeeSerializer which we have created"""
 from .serializers import EmployeeSerializer
-
-"""contains Core tools for working with streams"""
-import io
-
-"""Parses JSON request content. request.data will be populated with a dictionary of data."""
-from rest_framework.parsers import JSONParser
-
-"""
-Used for read-only endpoints to represent a collection of model instances
-Provides a get method handler.
-"""
 from rest_framework.generics import ListAPIView
-
-""" learning this part """
 from django_filters.rest_framework import DjangoFilterBackend
-
 from rest_framework import status
-
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from .functionality import CreateEmployee, DisplayEmployee, UpdateEmployee, DeleteEmployee
+
 
 class EmployeeList(ListAPIView):
     """
@@ -53,64 +35,34 @@ def EmployeeDetails(request, id=None):
     employee id to display information
     """
     if request.method == 'GET':
-        if id is not None:
-            try:
-                specific_employee_obj = Employee.objects.get(id=id)
-            except Employee.DoesNotExist:
-                return Response({'msg': 'not exist'}, status=status.HTTP_404_NOT_FOUND)
-            else:
-                serializer = EmployeeSerializer(specific_employee_obj)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-
-        all_employee_obj = Employee.objects.all()
-        serializer = EmployeeSerializer(all_employee_obj, many=True)  # if multiple object then many = true
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        ret_value = DisplayEmployee(id)
+        if ret_value == status.HTTP_404_NOT_FOUND:
+            return Response({'msg': 'not exist'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response(ret_value, status=status.HTTP_200_OK)
 
     elif request.method == 'POST':
-        json_data = request.body  # getting json data and converting to python
-        stream = io.BytesIO(json_data)
-        python_data = JSONParser().parse(stream)
-        serializer = EmployeeSerializer(data=python_data)
-        if serializer.is_valid():
-            serializer.save()
+        ret_value = CreateEmployee(request)
+        if ret_value == status.HTTP_201_CREATED:
             return Response({'msg': 'data created'}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(ret_value, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'PUT' or request.method == 'PATCH':
-        json_data = request.body
-        stream = io.BytesIO(json_data)
-        python_data = JSONParser().parse(stream)
-        if id is None:
-            id = python_data.get('id')
-            if id is None:
-                return Response({'msg': 'enter id'}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            specific_employee_obj = Employee.objects.get(id=id)
-        except Employee.DoesNotExist:
+        ret_value = UpdateEmployee(request, id)
+        if ret_value == status.HTTP_400_BAD_REQUEST:
+            return Response({'msg': 'enter id'}, status=status.HTTP_400_BAD_REQUEST)
+        elif not ret_value:
             return Response({'msg': 'id does not exist'}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            if request.method == 'PUT':
-                serializer = EmployeeSerializer(specific_employee_obj, data=python_data)
-            else:
-                serializer = EmployeeSerializer(specific_employee_obj, data=python_data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response({'msg': 'data updated'}, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        elif ret_value == status.HTTP_201_CREATED:
+            return Response({'msg': 'data updated'}, status=status.HTTP_201_CREATED)
+        return Response(ret_value, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
-        if id is None:
-            json_data = request.body
-            stream = io.BytesIO(json_data)
-            python_data = JSONParser().parse(stream)
-            id = python_data.get('id')
-            if id is None:
-                return Response({'msg': 'enter id'}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            specific_employee_obj = Employee.objects.get(id=id)
-        except Employee.DoesNotExist:
-            return Response({'msg': 'id does not exist'}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            specific_employee_obj.delete()
-            return Response({'msg': 'data deleted'}, status=status.HTTP_200_OK)
+       ret_value = DeleteEmployee(request, id)
+       if ret_value == status.HTTP_400_BAD_REQUEST:
+           return Response({'msg': 'enter id in url or in body'}, status=status.HTTP_400_BAD_REQUEST)
+       elif not ret_value:
+           return Response({'msg': 'id does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+       return Response({'msg': 'data deleted'}, status=status.HTTP_200_OK)
 
