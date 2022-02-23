@@ -1,3 +1,4 @@
+"""all import statement"""
 from .models import Employee
 from .serializers import EmployeeSerializer
 from rest_framework.generics import ListAPIView
@@ -5,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .functionality import CreateEmployee, DisplayEmployee, UpdateEmployee, DeleteEmployee
+from .employee_operations import CreateEmployee, DisplayEmployee, UpdateEmployee, DeleteEmployee
 
 
 class EmployeeList(ListAPIView):
@@ -32,8 +33,9 @@ def EmployeeDetails(request, id=None):
     an HttpRequest object
 
     id : int, optional
-    employee id to display information
+    it is users id to for performing operation
     """
+
     if request.method == 'GET':
         ret_value = DisplayEmployee(id)
         if ret_value == status.HTTP_404_NOT_FOUND:
@@ -59,10 +61,9 @@ def EmployeeDetails(request, id=None):
         return Response(ret_value, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
-       ret_value = DeleteEmployee(request, id)
-       if ret_value == status.HTTP_400_BAD_REQUEST:
-           return Response({'msg': 'enter id in url or in body'}, status=status.HTTP_400_BAD_REQUEST)
-       elif not ret_value:
-           return Response({'msg': 'id does not exist'}, status=status.HTTP_400_BAD_REQUEST)
-       return Response({'msg': 'data deleted'}, status=status.HTTP_200_OK)
-
+        ret_value = DeleteEmployee(request, id)
+        if ret_value == status.HTTP_400_BAD_REQUEST:
+            return Response({'msg': 'enter id in url or in body'}, status=status.HTTP_400_BAD_REQUEST)
+        elif not ret_value:
+            return Response({'msg': 'id does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'msg': 'data deleted'}, status=status.HTTP_200_OK)

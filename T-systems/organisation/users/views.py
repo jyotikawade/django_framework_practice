@@ -1,7 +1,8 @@
+"""all import statement"""
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .functionality import DisplayUser, CreateUser, UpdateUser, DeleteUser
+from .user_operations import DisplayUser, CreateUser, UpdateUser, DeleteUser
 
 
 @api_view(['GET', 'post', 'put', 'patch', 'delete'])
@@ -14,7 +15,7 @@ def UserDetails(request, id=None):
         an HttpRequest object
 
         id : int, optional
-        employee id to display information
+        it is employee id to for performing operation
     """
 
     if request.method == 'GET':
