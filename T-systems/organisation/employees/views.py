@@ -25,16 +25,19 @@ class EmployeeList(ListAPIView):
 
 
 @api_view(['GET', 'post', 'put', 'patch', 'delete'])
-def EmployeeDetails(request, id=None):
+def EmployeeDetails(request):
     """
     Parameters
     ----------
     request :
     an HttpRequest object
-
-    id : int, optional
-    it is users id to for performing operation
     """
+
+    is_empty = not request.query_params
+    if is_empty is True:
+        id = None
+    else:
+        id = request.query_params['id']
 
     if request.method == 'GET':
         ret_value = DisplayEmployee(id)

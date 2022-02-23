@@ -12,11 +12,10 @@ import users.views
 urlpatterns = [
     re_path(r'^admin/', admin.site.urls),
 
-    re_path(r'^employees/$', employees.views.EmployeeDetails),
-    re_path(r'^employees/(?P<id>\d+)$', employees.views.EmployeeDetails),
+    re_path(r'^employees', employees.views.EmployeeDetails),
     re_path(r'^employees/filter/$', employees.views.EmployeeList.as_view()),
+    re_path(r'^users', users.views.UserDetails),
 
-    re_path(r'^users/$', users.views.UserDetails),
-    re_path(r'^users/(?P<id>\d+)$', users.views.UserDetails),
+
 
 ]

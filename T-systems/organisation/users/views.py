@@ -6,17 +6,20 @@ from .user_operations import DisplayUser, CreateUser, UpdateUser, DeleteUser
 
 
 @api_view(['GET', 'post', 'put', 'patch', 'delete'])
-def UserDetails(request, id=None):
+def UserDetails(request):
 
     """
         Parameters
         ----------
         request :
         an HttpRequest object
-
-        id : int, optional
-        it is employee id to for performing operation
     """
+
+    is_empty = not request.query_params
+    if is_empty is True:
+        id = None
+    else:
+        id = request.query_params['id']
 
     if request.method == 'GET':
         ret_value = DisplayUser(id)

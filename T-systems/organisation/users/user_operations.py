@@ -3,7 +3,7 @@ from rest_framework import status
 from .serializers import UserSerializer
 import io
 from rest_framework.parsers import JSONParser
-from rest_framework.response import Response
+
 
 def DisplayUser(id):
     if id is not None:
