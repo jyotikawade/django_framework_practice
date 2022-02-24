@@ -33,11 +33,11 @@ def EmployeeDetails(request):
     an HttpRequest object
     """
 
-    is_empty = not request.query_params
-    if is_empty is True:
-        id = None
-    else:
+    is_empty = request.query_params
+    if 'id' in is_empty.keys():
         id = request.query_params['id']
+    else:
+        id = None
 
     if request.method == 'GET':
         ret_value = DisplayEmployee(id)
@@ -70,3 +70,4 @@ def EmployeeDetails(request):
         elif not ret_value:
             return Response({'msg': 'id does not exist'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'msg': 'data deleted'}, status=status.HTTP_200_OK)
+

@@ -80,4 +80,3 @@ def DeleteEmployee(request, id):
 
 
 
-

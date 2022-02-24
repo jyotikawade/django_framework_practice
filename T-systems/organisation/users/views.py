@@ -15,11 +15,11 @@ def UserDetails(request):
         an HttpRequest object
     """
 
-    is_empty = not request.query_params
-    if is_empty is True:
-        id = None
-    else:
+    is_empty = request.query_params
+    if 'id' in is_empty.keys():
         id = request.query_params['id']
+    else:
+        id = None
 
     if request.method == 'GET':
         ret_value = DisplayUser(id)
